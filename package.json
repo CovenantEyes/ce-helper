@@ -10,8 +10,7 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:**/wscript",
-        "onCommand:ceHelper.exitOngoingProcess"
+        "workspaceContains:./wscript"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -30,11 +29,23 @@
             },
             {
                 "command": "ceHelper.exitOngoingProcess",
-                "title": "exit active ce task",
+                "title": "exit active CE task",
                 "icon": {
                     "light": "media/light/terminate.svg",
                     "dark": "media/dark/terminate.svg"
                 }
+            },
+            {
+                "command": "ceHelper.refreshUI",
+                "title": "refresh CE ui"
+            },
+            {
+                "command": "ceHelper.getSubmodules",
+                "title": "pull git submodules"
+            },
+            {
+                "command": "ceHelper.cloneRepository",
+                "title": "clone zarf"
             }
         ],
         "viewsContainers": {
@@ -42,14 +53,15 @@
                 {
                     "id": "ce-menu",
                     "title": "Covenant Eyes",
-                    "icon": "media/ce-logo.svg"
+                    "icon": "media/ce-logo.svg",
+                    "when": "ceExtensionIsActive"
                 }
             ]
         },
         "views": {
             "ce-menu": [
                 {
-                    "id": "basicZarfTree",
+                    "id": "ceTree",
                     "name": ""
                 }
             ]
