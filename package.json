@@ -1,0 +1,87 @@
+{
+    "name": "ce-helper",
+    "displayName": "CE Helper",
+    "description": "Command Helper for Covenant Eyes Developers",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.40.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "workspaceContains:**/wscript",
+        "onCommand:ceHelper.exitOngoingProcess"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "zarfModules.buildZarfModule",
+                "title": "build"
+            },
+            {
+                "command": "wafCommands.runWafCommand",
+                "title": "execute"
+            },
+            {
+                "command": "npmCommands.runNPMCommand",
+                "title": "execute"
+            },
+            {
+                "command": "ceHelper.exitOngoingProcess",
+                "title": "exit active ce task",
+                "icon": {
+                    "light": "media/light/terminate.svg",
+                    "dark": "media/dark/terminate.svg"
+                }
+            }
+        ],
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "ce-menu",
+                    "title": "Covenant Eyes",
+                    "icon": "media/ce-logo.svg"
+                }
+            ]
+        },
+        "views": {
+            "ce-menu": [
+                {
+                    "id": "basicZarfTree",
+                    "name": ""
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "ceHelper.exitOngoingProcess",
+                    "group": "navigation",
+                    "when": "ceCommandActive"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile",
+        "test": "node ./out/test/runTest.js"
+    },
+    "devDependencies": {
+        "@types/glob": "7.1.1",
+        "@types/mocha": "5.2.7",
+        "@types/node": "12.11.7",
+        "@types/vscode": "1.40.0",
+        "glob": "7.1.5",
+        "mocha": "6.2.2",
+        "tslint": "5.20.0",
+        "typescript": "3.6.4",
+        "vsce": "1.70.0",
+        "vscode-test": "1.2.2"
+    },
+    "dependencies": {}
+}

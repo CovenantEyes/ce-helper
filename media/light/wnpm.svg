@@ -1,0 +1,24 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <style>
+            .background { fill: #cb3837 }
+            .npm { fill: #FFFFFF }
+            .waf-logo-color { fill: #424242; }
+        </style>
+    </defs>
+    <rect x="6" y="6" width="10" height="10" class="background" />
+    <path class="npm" d="M 7 7 h8 v8 h-2 v-6 h-2 v6 h-4 z" />
+
+    <g transform="scale(.6)">
+        <circle cx="2" cy="15.5" r=".5" class="waf-logo-color" />
+        <circle cx="14" cy="15.5" r=".5" class="waf-logo-color" />
+        <rect x="2" y="15" width="12" height="1" class="waf-logo-color" />
+
+        <circle cx="2" cy="10.5" r=".5" class="waf-logo-color" />
+        <circle cx="14" cy="10.5" r=".5" class="waf-logo-color" />
+        <rect x="2" y="10" width="12" height="1" class="waf-logo-color" />
+
+        <circle cx="8" cy="3.5" r="3.5" class="waf-logo-color" />
+        <rect x="7.5" y="3" width="1" height="12" class="waf-logo-color" />
+    </g>
+</svg>

@@ -1,0 +1,21 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <style>
+            .zarf { stroke: #C5C5C5; stroke-width: 0.5; }
+            .waf-logo-color { fill: #0091d1; }
+        </style>
+    </defs>
+    <path class="zarf" d="M1 1 a10 5 0 0 0 14 0 v12 a10 5 0 0 1 -14 0 v-12" />
+    <g transform="scale(.6) translate(5, 5)">
+        <circle cx="2" cy="15.5" r=".5" class="waf-logo-color"/>
+        <circle cx="14" cy="15.5" r=".5" class="waf-logo-color"/>
+        <rect x="2" y="15" width="12" height="1" class="waf-logo-color"/>
+
+        <circle cx="2" cy="10.5" r=".5" class="waf-logo-color"/>
+        <circle cx="14" cy="10.5" r=".5" class="waf-logo-color"/>
+        <rect x="2" y="10" width="12" height="1" class="waf-logo-color"/>
+
+        <circle cx="8" cy="3.5" r="3.5" class="waf-logo-color"/>
+        <rect x="7.5" y="3" width="1" height="12" class="waf-logo-color"/>
+    </g>
+</svg>

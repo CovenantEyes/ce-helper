@@ -1,0 +1,17 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <style>
+            .waf-logo-color { fill: #f2e000; }
+        </style>
+    </defs>
+    <circle cx="2" cy="15.5" r=".5" class="waf-logo-color" />
+    <circle cx="14" cy="15.5" r=".5" class="waf-logo-color" />
+    <rect x="2" y="15" width="12" height="1" class="waf-logo-color" />
+
+    <circle cx="2" cy="10.5" r=".5" class="waf-logo-color" />
+    <circle cx="14" cy="10.5" r=".5" class="waf-logo-color" />
+    <rect x="2" y="10" width="12" height="1" class="waf-logo-color" />
+
+    <circle cx="8" cy="3.5" r="3.5" class="waf-logo-color" />
+    <rect x="7.5" y="3" width="1" height="12" class="waf-logo-color" />
+</svg>
