@@ -2,9 +2,7 @@ import * as vscode from 'vscode';
 
 import { Node, NodeType } from './TreeData';
 import { WorkspaceAttributes } from './WorkspaceDiscovery';
-import { getIconPair } from './VSCodeUtils';
-
-type IconPath = string | vscode.Uri | { light: string | vscode.Uri; dark: string | vscode.Uri } | vscode.ThemeIcon;
+import { getIconPair, IconPath } from './VSCodeUtils';
 
 class GroupHeader extends vscode.TreeItem {
     constructor(

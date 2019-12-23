@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as child_process from 'child_process';
 
-import { setContext } from './VSCodeUtils';
+import { setContext, singularBasePath } from './VSCodeUtils';
+import { getWafArgsIfRelevant } from './WafUtil';
 
 interface ChildProcess {
     readonly process: child_process.ChildProcessWithoutNullStreams;
@@ -16,12 +17,16 @@ export default class CommandExecutor {
         this.channel = vscode.window.createOutputChannel('CE Command Executor');
     }
 
-    public executeWafCommand(args: string[]) {
+    public async executeWafCommand(args: string[]) {
         if (!vscode.workspace.rootPath) {
             return;
         }
 
-        this.spawnCommand(vscode.workspace.rootPath, 'waf', args);
+        const extraArgs = await getWafArgsIfRelevant(args[0]);
+
+        const allArgs = [ ...args, ...extraArgs];
+
+        this.spawnCommand(vscode.workspace.rootPath, 'waf', allArgs);
     }
 
     public executeNPMCommand(args: string[]) {
@@ -42,6 +47,21 @@ export default class CommandExecutor {
         );
     }
 
+    public getSubmodules() {
+        const maybeRoot = singularBasePath();
+        if (maybeRoot) {
+            this.spawnCommand(maybeRoot, 'git', [ 'submodule', 'update', '--init' ]);
+        }
+    }
+
+    public cloneRepository(args: string[]) {
+        const [ repoUrl, tag ] = args;
+        const maybeRoot = singularBasePath();
+        if (maybeRoot) {
+            this.spawnCommand(maybeRoot, 'git', [ 'clone', '--branch', tag, repoUrl ]);
+        }
+    }
+
     public async cancelProcess(): Promise<void> {
         if (this.activeProcess) {
             // Waf and wafexec use exec() and execvpe() to spawn child processes, which is problematc for node's
@@ -52,15 +72,15 @@ export default class CommandExecutor {
         }
     }
 
-    public async shutdown(): Promise<void> {
-        if (!this.activeProcess) {
-            return;
-        }
-
-        await this.cancelProcess();
+    public async awaitIdle(): Promise<void> {
         if (this.activeProcess) {
             await this.activeProcess.completionPromise;
         }
+    }
+
+    public async shutdown(): Promise<void> {
+        await this.cancelProcess();
+        await this.awaitIdle();
     }
 
     private async spawnCommand(cwd: string, executable: string, args: string[]): Promise<void> {

@@ -1,5 +1,6 @@
-import * as shell from './ShellUtils';
+import * as vscode from 'vscode';
 
+import * as shell from './ShellUtils';
 import { Node, NodeType } from './TreeData';
 
 export async function getWafCommands(wafPath: string): Promise<Node[]> {
@@ -28,4 +29,24 @@ export async function getWafCommands(wafPath: string): Promise<Node[]> {
     }
 
     return commands;
+}
+
+const CommandsThatMayNeedArgs = [
+    'configure',
+];
+
+/** Prompts the user for additional arguments if the command is one that would
+  * typically benefit from them.
+  */
+export async function getWafArgsIfRelevant(command: string): Promise<string[]> {
+    if (!CommandsThatMayNeedArgs.includes(command)) {
+        return [];
+    }
+
+    const extraArgs = await vscode.window.showInputBox({
+        prompt: `Additional options for ${command} (optional):`,
+        placeHolder: 'e.g. --debug',
+    });
+
+    return extraArgs ? extraArgs.split(' ') : [];
 }
