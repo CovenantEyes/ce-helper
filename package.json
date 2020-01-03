@@ -3,6 +3,11 @@
     "displayName": "CE Helper",
     "description": "Command Helper for Covenant Eyes Developers",
     "version": "0.0.1",
+    "publisher": "alexbowen",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/CovenantEyes/ce-helper.git"
+    },
     "engines": {
         "vscode": "^1.40.0"
     },
