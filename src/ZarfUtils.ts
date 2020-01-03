@@ -27,10 +27,18 @@ export async function getZarfModules(basePath: string): Promise<Node[]> {
 
         const modulePath: string[] = [];
 
+        let fqProjectName = '';
         for (const segment of segments) {
+            fqProjectName = join(fqProjectName, segment);
             modulePath.push(segment);
             if (!node.children.some(child => child.name === segment)) {
-                const newNode = new Node(segment, '', NodeType.ZARF_MODULE, join(basePath, ...modulePath));
+                const newNode = new Node(
+                    segment,
+                    `Build ${segment}`,
+                    NodeType.ZARF_MODULE,
+                    join(basePath, ...modulePath),
+                    fqProjectName
+                );
 
                 node.children.push(newNode);
                 node = newNode;
@@ -43,7 +51,7 @@ export async function getZarfModules(basePath: string): Promise<Node[]> {
     return dirTree.children;
 }
 
-const tagRegex = /'repo'.*?git@github\.com:CovenantEyes\/zarf\.git.*?'tag'.*?'(?<tag>.*?)'/s;
+const tagRegex = /('|")repo('|").*?git@github\.com:CovenantEyes\/zarf\.git.*?('|")tag('|").*?('|")(?<tag>.*?)('|")/s;
 
 /**
  * Gets the desired zarf tag based on the wscript.

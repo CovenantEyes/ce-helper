@@ -47,7 +47,7 @@ class ZarfModule extends vscode.TreeItem {
 }
 
 export default class BasicZarfTree implements vscode.TreeDataProvider<Node> {
-    private nodes: Node[];
+    protected nodes: Node[];
 
     constructor(workspaceAttributes: WorkspaceAttributes) {
         this.nodes = [];
@@ -82,12 +82,12 @@ export default class BasicZarfTree implements vscode.TreeDataProvider<Node> {
             case NodeType.NPM_COMMAND:
                 return new BasicZarfTerminus(
                     element.name,
-                    '',
+                    element.description,
                     getIconPair('wnpm.svg'),
                     {
                         title: 'execute',
                         command: 'npmCommands.runNPMCommand',
-                        arguments: [ [ element.commandPath, element.name ] ],
+                        arguments: [ element ],
                     }
                 );
             case NodeType.WAF_COMMAND:
@@ -98,7 +98,7 @@ export default class BasicZarfTree implements vscode.TreeDataProvider<Node> {
                     {
                         title: 'execute',
                         command: 'wafCommands.runWafCommand',
-                        arguments: [ [ element.name ] ],
+                        arguments: [ element ],
                     }
                 );
             case NodeType.ZARF_MODULE:
@@ -110,9 +110,11 @@ export default class BasicZarfTree implements vscode.TreeDataProvider<Node> {
                     {
                         title: 'build',
                         command: 'zarfModules.buildZarfModule',
-                        arguments: [ [ element.commandPath ] ],
+                        arguments: [ element ],
                     }
                 );
+            case NodeType.SPACER:
+                return new BasicZarfTerminus(element.name, element.description, '');
             default:
                 return new BasicZarfTreeFolder(element.name);
         }

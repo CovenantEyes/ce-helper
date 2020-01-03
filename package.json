@@ -37,7 +37,11 @@
             },
             {
                 "command": "ceHelper.refreshUI",
-                "title": "refresh CE ui"
+                "title": "refresh CE ui",
+                "icon": {
+                    "light": "media/light/refresh.svg",
+                    "dark": "media/dark/refresh.svg"
+                }
             },
             {
                 "command": "ceHelper.getSubmodules",
@@ -72,10 +76,20 @@
                     "command": "ceHelper.exitOngoingProcess",
                     "group": "navigation",
                     "when": "ceCommandActive"
+                },
+                {
+                    "command": "ceHelper.refreshUI",
+                    "group": "navigation"
                 }
             ]
         }
     },
+    "taskDefinitions": [
+        { "type": "waf" },
+        { "type": "wafexec" },
+        { "type": "zarf" },
+        { "type": "git" }
+    ],
     "scripts": {
         "vscode:prepublish": "npm run compile",
         "compile": "tsc -p ./",
@@ -85,6 +99,7 @@
     },
     "devDependencies": {
         "@types/glob": "7.1.1",
+        "@types/lodash": "4.14.149",
         "@types/mocha": "5.2.7",
         "@types/node": "12.11.7",
         "@types/vscode": "1.40.0",
@@ -95,5 +110,7 @@
         "vsce": "1.70.0",
         "vscode-test": "1.2.2"
     },
-    "dependencies": {}
+    "dependencies": {
+        "lodash": "4.17.15"
+    }
 }

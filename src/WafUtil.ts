@@ -5,7 +5,7 @@ import { Node, NodeType } from './TreeData';
 
 export async function getWafCommands(wafPath: string): Promise<Node[]> {
     const rawOutput = await shell.exec([ wafPath, '--help' ]);
-    const lines = rawOutput[0].split('\n');
+    const lines = rawOutput[0].replace(/\r/g, '').split('\n');
     let startIndex = 0;
     let endIndex = 0;
 
