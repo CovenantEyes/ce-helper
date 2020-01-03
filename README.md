@@ -1,65 +1,61 @@
-# ce-helper README
+# ce-helper
 
-This is the README for your extension "ce-helper". After writing up a brief description, we recommend including the following sections.
+This extension is specific to CovenantEyes Developers. Specifically, it helps to smooth over some operations with `zarf`, `waf`, and `wafexec`.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Commands
 
-For example if there is an image subfolder under your extension project workspace:
+The extension has a command tree view that allows clickable command execution for systems such as:
 
-\!\[feature X\]\(images/feature-x.png\)
+#### waf
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+![waf configure](images/waf_configure.gif)
 
-## Requirements
+#### Building Individual Zarf Modules
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+![build zarf module](images/build_individual_zarf_module.gif)
 
-## Extension Settings
+#### NPM Script Via wafexec
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+![wafexec npm](images/run_npm_script.gif)
 
-For example:
+Scaffolder-based projects also have common commands "bubbled" up to the top of the list. Additional project types may be recognized in the future.
 
-This extension contributes the following settings:
+![bubbled commands](images/bubbled_commands.png)
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+#### Command Management
+
+Tasks started from the menu can be killed at any time.
+
+![kill task](images/kill_task.gif)
+
+Currently, only one task may be run at a time from the menu.
+
+![single task](images/single_task.gif)
+
+### Acquiring Zarf
+
+When opening a freshly-cloned project that requires zarf, an option is presented to grab it automatically based on the `wscript`.
+
+![clone zarf tag](images/clone_zarf_tag.gif)
+
+It also works if `zarf` is a submodule.
+
+![get submodules](images/git_submodules.gif)
+
+### Tasks
+
+The three command types are implemented via VSCode Tasks, and each discovered operation is also registered as a task with a fixed name, so they can be used from non-gui VSCode settings.
+
+- Waf tasks have the schema `waf: <command>`.
+- Zarf submodules have the schema `zarf: build <relative/folder/path>`
+- Wafexec-NPM scripts have the schema `wnpm: <project>/<script-name>`
+
+For example, you can use a zarf build task in a debugger configuration:
+
+![zarf debug](images/zarf_prebuild_task.gif)
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Task definitions are not particularly robust, as they lack properties. This means that tasks cannot be used via the `tasks.json` file, and everything is reliant on the fully-resolved tasks found automatically on extension startup.
