@@ -1,80 +1,96 @@
 import * as vscode from 'vscode';
-import * as child_process from 'child_process';
 
+import nodeToTask from './TaskGeneration';
+import { Node, NodeType } from './TreeData';
 import { setContext, singularBasePath } from './VSCodeUtils';
 import { getWafArgsIfRelevant } from './WafUtil';
+import { WorkspaceAttributes } from './WorkspaceDiscovery';
 
-interface ChildProcess {
-    readonly process: child_process.ChildProcessWithoutNullStreams;
+interface ActiveTask {
+    readonly task: vscode.TaskExecution;
     readonly completionPromise: Promise<void>;
 }
 
 export default class CommandExecutor {
-    private channel: vscode.OutputChannel;
-    private activeProcess?: ChildProcess;
+    private activeTask?: ActiveTask;
+    resolveCompletion?: () => void;
 
     constructor() {
-        this.channel = vscode.window.createOutputChannel('CE Command Executor');
+        vscode.tasks.onDidEndTask(e => {
+            if (
+                this.activeTask
+                && this.resolveCompletion
+                && e.execution.task === this.activeTask.task.task
+            ) {
+                this.resolveCompletion();
+            }
+        });
     }
 
-    public async executeWafCommand(args: string[]) {
-        if (!vscode.workspace.rootPath) {
+    public async launchNodeCommand(node: Node, attributes?: WorkspaceAttributes) {
+        if (!attributes) {
             return;
         }
 
-        const extraArgs = await getWafArgsIfRelevant(args[0]);
+        const task = nodeToTask(node, attributes);
+        if (!task) {
+            return;
+        }
 
-        const allArgs = [ ...args, ...extraArgs];
+        const execution = task.execution as vscode.ProcessExecution;
 
-        this.spawnCommand(vscode.workspace.rootPath, 'waf', allArgs);
+        if (execution && node.type === NodeType.WAF_COMMAND) {
+            const extraArgs = await getWafArgsIfRelevant(node.name);
+            extraArgs.forEach(x => execution.args.push(x));
+        }
+
+        this.launchSerialTask(task);
     }
 
-    public executeNPMCommand(args: string[]) {
-        const [ commandPath, npmCommand ] = args;
-        this.spawnCommand(
-            commandPath,
-            'wafexec',
-            [ 'npm', 'run', npmCommand ]
-        );
-    }
-
-    public buildZarfModule(args: string[]) {
-        const [ commandPath ] = args;
-        this.spawnCommand(
-            commandPath,
-            'waf',
-            [ ]
-        );
-    }
-
-    public getSubmodules() {
+    public async getSubmodules(): Promise<void> {
         const maybeRoot = singularBasePath();
         if (maybeRoot) {
-            this.spawnCommand(maybeRoot, 'git', [ 'submodule', 'update', '--init' ]);
+            await this.launchSerialTask(new vscode.Task(
+                { type: 'git '},
+                vscode.TaskScope.Global,
+                'update submodules',
+                'git',
+                new vscode.ProcessExecution(
+                    'git',
+                    [ 'submodule', 'update', '--init' ],
+                    { cwd: maybeRoot }
+                )
+            ));
         }
     }
 
-    public cloneRepository(args: string[]) {
+    public async cloneRepository(args: string[]): Promise<void> {
         const [ repoUrl, tag ] = args;
         const maybeRoot = singularBasePath();
         if (maybeRoot) {
-            this.spawnCommand(maybeRoot, 'git', [ 'clone', '--branch', tag, repoUrl ]);
+            await this.launchSerialTask(new vscode.Task(
+                { type: 'git '},
+                vscode.TaskScope.Global,
+                'update submodules',
+                'git',
+                new vscode.ProcessExecution(
+                    'git',
+                    [ 'clone', '--branch', tag, repoUrl ],
+                    { cwd: maybeRoot }
+                )
+            ));
         }
     }
 
     public async cancelProcess(): Promise<void> {
-        if (this.activeProcess) {
-            // Waf and wafexec use exec() and execvpe() to spawn child processes, which is problematc for node's
-            // child_process. Since we spawn our active process detached, we can use its negative pid to kill the
-            // whole group.
-            process.kill(this.activeProcess.process.pid * -1);
-            this.channel.append('\n(process killed by user)\n');
+        if (this.activeTask) {
+            this.activeTask.task.terminate();
         }
     }
 
     public async awaitIdle(): Promise<void> {
-        if (this.activeProcess) {
-            await this.activeProcess.completionPromise;
+        if (this.activeTask) {
+            await this.activeTask.completionPromise;
         }
     }
 
@@ -83,44 +99,27 @@ export default class CommandExecutor {
         await this.awaitIdle();
     }
 
-    private async spawnCommand(cwd: string, executable: string, args: string[]): Promise<void> {
-        if (this.activeProcess) {
+    private async launchSerialTask(task: vscode.Task): Promise<void> {
+        if (this.activeTask) {
             vscode.window.showErrorMessage('Parallel CE tasks not supported!');
             return;
         }
 
         setContext('ceCommandActive', true);
 
-        this.channel.clear();
-        this.channel.show(true);
-
-        const write = (data: Buffer) => {
-            this.channel.append(data.toString());
-        };
-
-        const process = child_process.spawn(executable, args, { cwd, detached: true });
-
-        process.stdout.on('data', write);
-        process.stderr.on('data', write);
-
+        const execution = await vscode.tasks.executeTask(task);
         const completionPromise = new Promise<void>(resolve => {
-            process.on('close', () => {
-                resolve();
-            });
-
-            process.on('error', (err) => {
-                vscode.window.showErrorMessage(`${err}`);
-                resolve();
-            });
+            this.resolveCompletion = resolve;
         });
 
-        this.activeProcess = { process, completionPromise };
+        this.activeTask = {
+            task: execution,
+            completionPromise,
+        };
 
         await completionPromise;
 
-        this.channel.append('\n(done)\n');
-
-        this.activeProcess = undefined;
+        this.activeTask = undefined;
 
         setContext('ceCommandActive', false);
     }

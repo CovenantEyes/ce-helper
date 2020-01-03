@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import { fileExists, folderExists } from './FileUtils';
 import { Node } from './TreeData';
-import { getNPMNodes } from './NPMUtils';
+import { getNPMNodes, ScaffolderConfig } from './NPMUtils';
 import { getWafCommands } from './WafUtil';
 import { getZarfModules } from './ZarfUtils';
 
@@ -43,6 +43,7 @@ export interface WorkspaceAttributes {
     readonly npmNodes?: Node[];
     readonly wafCommands?: Node[];
     readonly zarfNodes?: Node[];
+    readonly scaffolderConfig?: ScaffolderConfig;
 }
 
 export async function discoverWorkspace(): Promise<WorkspaceAttributes> {
@@ -57,7 +58,7 @@ export async function discoverWorkspace(): Promise<WorkspaceAttributes> {
         return { type: ProjectType.MULTI_FOLDERS, paths: { } };
     }
 
-    const basePath = folders[0].uri.path;
+    const basePath = folders[0].uri.fsPath;
 
     const wscriptPath = path.join(basePath, 'wscript');
 
@@ -93,9 +94,11 @@ export async function discoverWorkspace(): Promise<WorkspaceAttributes> {
     const wafCommandsPromise = getWafCommands(wafPath);
 
     const scaffolderJSONPath = path.join(basePath, '.scaffolder.json');
+    let scaffolderConfig: ScaffolderConfig | undefined;
     if (await fileExists(scaffolderJSONPath)) {
         try {
-            const scaffolderConfig = JSON.parse((await fs.readFile(scaffolderJSONPath)).toString());
+            scaffolderConfig = JSON.parse((await fs.readFile(scaffolderJSONPath)).toString()) as ScaffolderConfig;
+
             if (scaffolderConfig.options.template === 'typescript_express') {
                 projectType = ProjectType.SCAFFOLDER_TYPESCRIPT_EXPRESS;
             }
@@ -116,5 +119,6 @@ export async function discoverWorkspace(): Promise<WorkspaceAttributes> {
         npmNodes: await npmNodesPromise,
         wafCommands: await wafCommandsPromise,
         zarfNodes: await zarfModulesPromise,
+        scaffolderConfig,
     };
 }

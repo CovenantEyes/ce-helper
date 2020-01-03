@@ -46,5 +46,5 @@ export function singularBasePath(): string | undefined {
         return undefined;
     }
 
-    return folders[0].uri.path;
+    return folders[0].uri.fsPath;
 }
