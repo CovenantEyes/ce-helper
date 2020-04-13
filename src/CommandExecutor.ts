@@ -20,7 +20,8 @@ export default class CommandExecutor {
             if (
                 this.activeTask
                 && this.resolveCompletion
-                && e.execution.task === this.activeTask.task.task
+                && e.execution.task.name === this.activeTask.task.task.name
+                && e.execution.task.source === this.activeTask.task.task.source
             ) {
                 this.resolveCompletion();
             }
