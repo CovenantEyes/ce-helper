@@ -90,10 +90,18 @@
         }
     },
     "taskDefinitions": [
-        { "type": "waf" },
-        { "type": "wafexec" },
-        { "type": "zarf" },
-        { "type": "git" }
+        {
+            "type": "waf"
+        },
+        {
+            "type": "wafexec"
+        },
+        {
+            "type": "zarf"
+        },
+        {
+            "type": "git"
+        }
     ],
     "scripts": {
         "vscode:prepublish": "npm run compile",
@@ -116,6 +124,7 @@
         "vscode-test": "1.2.2"
     },
     "dependencies": {
-        "lodash": "4.17.15"
+        "lodash": "4.17.15",
+        "minimist": "0.2.1"
     }
 }
